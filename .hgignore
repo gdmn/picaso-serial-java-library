@@ -1,0 +1,10 @@
+syntax: glob
+
+*~
+.classpath
+.project
+.settings/*
+target
+nb-configuration.xml
+nbactions.xml
+

@@ -25,4 +25,6 @@ public interface Serial {
 	boolean isAvailable();
 	
 	void setBaud(int baud);
+	
+	void clearBuf();
 }

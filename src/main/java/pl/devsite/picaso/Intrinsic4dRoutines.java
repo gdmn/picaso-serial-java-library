@@ -16,6 +16,7 @@ public class Intrinsic4dRoutines {
 
 	protected Serial serial;
 	public static final long TimeLimit4D = 100;
+	private int beginIgnoreAckCounter = 0;
 
 	public Intrinsic4dRoutines(Serial serial) {
 		this.serial = serial;
@@ -53,10 +54,15 @@ public class Intrinsic4dRoutines {
 		int readc;
 		readc = 0;
 		sttime = System.currentTimeMillis();
-		while ((readc != size) && (System.currentTimeMillis() - sttime < TimeLimit4D)) {
-			if (serial.isAvailable()) {
-				data[readc++] = serial.read();
+		try {
+			while ((readc != size) && (System.currentTimeMillis() - sttime < TimeLimit4D)) {
+				if (serial.isAvailable()) {
+					data[readc++] = serial.read();
+				} else {
+					Thread.sleep(4);
+				}
 			}
+		} catch (InterruptedException ex) {
 		}
 		if ((readc != size)) {
 			throw new IOException("Not enough data read");
@@ -82,10 +88,9 @@ public class Intrinsic4dRoutines {
 	}
 
 	public void GetAck() throws IOException {
-		/*while (serial.isAvailable())
-		 if (6 == getbyte()) {
-		 return ;
-		 }*/
+		if (beginIgnoreAckCounter > 0) {
+			return;
+		}
 		byte r = getbyte();
 		if (0x6 != r) {
 			throw new IOException("Expected 0x6, not 0x" + Integer.toHexString(r));
@@ -104,11 +109,17 @@ public class Intrinsic4dRoutines {
 	}
 
 	public int GetAckResp() throws IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return 0;
+		}
 		GetAck();
 		return GetWord();
 	}
 
 	public int GetAckRes2Words(int[] words) throws IllegalArgumentException, IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return 0;
+		}
 		if (words == null || words.length != 2) {
 			throw new IllegalArgumentException("Length must be 2");
 		}
@@ -121,6 +132,9 @@ public class Intrinsic4dRoutines {
 	}
 
 	public void GetAck2Words(int[] words) throws IllegalArgumentException, IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return;
+		}
 		if (words == null || words.length != 2) {
 			throw new IllegalArgumentException("Length must be 2");
 		}
@@ -130,6 +144,9 @@ public class Intrinsic4dRoutines {
 	}
 
 	public int GetAckResSector(byte[] Sector) throws IllegalArgumentException, IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return 0;
+		}
 		if (Sector == null || Sector.length != 512) {
 			throw new IllegalArgumentException("Length must be 512");
 		}
@@ -141,6 +158,9 @@ public class Intrinsic4dRoutines {
 	}
 
 	public String GetAckResStr() throws IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return "";
+		}
 		int Result;
 		GetAck();
 		Result = GetWord();
@@ -148,11 +168,42 @@ public class Intrinsic4dRoutines {
 	}
 
 	public int GetAckResData(byte[] OutData, int size) throws IllegalArgumentException, IOException {
+		if (beginIgnoreAckCounter > 0) {
+			return 0;
+		}
 		int Result;
 		GetAck();
 		Result = GetWord();
 		getbytes(OutData, size);
 		return Result;
+	}
+
+	public void beginIgnoreAck() {
+		beginIgnoreAckCounter += 1;
+	}
+
+	public void endIgnoreAck() {
+		beginIgnoreAckCounter -= 1;
+		if (beginIgnoreAckCounter == 0) {
+			try {
+				Thread.sleep(100);
+				{
+					boolean something;
+					do {
+						something = false;
+						for (int i = 0; i < 10; i++) {
+							if (serial.isAvailable()) {
+								something = true;
+							}
+							serial.clearBuf();
+							Thread.sleep(12);
+						}
+					} while (something);
+				}
+			} catch (InterruptedException ex) {
+				Logger.getLogger(Intrinsic4dRoutines.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
 	}
 
 	public void SetThisBaudrate(int Newrate) {

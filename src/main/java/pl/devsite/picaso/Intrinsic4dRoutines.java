@@ -46,6 +46,10 @@ public class Intrinsic4dRoutines {
 		serial.write(Source);
 	}
 
+	public void WriteWords(int[] Source) throws IOException {
+		serial.write(Source);
+	}
+
 	public void getbytes(byte[] data, int size) throws IOException, IllegalArgumentException {
 		if (data == null || data.length != size) {
 			throw new IllegalArgumentException("Length must be " + size);

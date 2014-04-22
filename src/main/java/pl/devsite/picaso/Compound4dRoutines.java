@@ -547,7 +547,7 @@ public class Compound4dRoutines extends Intrinsic4dRoutines {
 		GetAck();
 	}
 
-	public void gfx_Polygon(int n, char[] Xvalues, char[] Yvalues, int Color) throws IOException {
+	public void gfx_Polygon(int n, int[] Xvalues, int[] Yvalues, int Color) throws IOException {
 		int[] towrite = new int[]{F_gfx_Polygon >> 8,
 			F_gfx_Polygon,
 			n >> 8,
@@ -560,7 +560,7 @@ public class Compound4dRoutines extends Intrinsic4dRoutines {
 		GetAck();
 	}
 
-	public void gfx_PolygonFilled(int n, char[] Xvalues, char[] Yvalues, int Color) throws IOException {
+	public void gfx_PolygonFilled(int n, int[] Xvalues, int[] Yvalues, int Color) throws IOException {
 		int[] towrite = new int[]{F_gfx_PolygonFilled >> 8,
 			F_gfx_PolygonFilled,
 			n >> 8,
@@ -574,7 +574,7 @@ public class Compound4dRoutines extends Intrinsic4dRoutines {
 		GetAck();
 	}
 
-	public void gfx_Polyline(int n, char[] Xvalues, char[] Yvalues, int Color) throws IOException {
+	public void gfx_Polyline(int n, int[] Xvalues, int[] Yvalues, int Color) throws IOException {
 		int[] towrite = new int[]{F_gfx_Polyline >> 8, F_gfx_Polyline, n >> 8, n};
 		WriteBytes(towrite);
 		WriteWords(Xvalues);

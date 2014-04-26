@@ -13,7 +13,7 @@ public class FifoBuf {
 
 	public synchronized void put(byte b) {
 		buf.addLast(b);
-		//System.out.println(" in: 0x"+Integer.toHexString(b)+" = "+b);
+		this.notify();
 	}
 
 	public synchronized byte pop() throws IOException {

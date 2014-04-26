@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class Intrinsic4dRoutines {
 
 	protected Serial serial;
-	public static final long TimeLimit4D = 100;
+	public static final long TimeLimit4D = 400;
 	private int beginIgnoreAckCounter = 0;
 
 	public Intrinsic4dRoutines(Serial serial) {
@@ -58,15 +58,8 @@ public class Intrinsic4dRoutines {
 		int readc;
 		readc = 0;
 		sttime = System.currentTimeMillis();
-		try {
-			while ((readc != size) && (System.currentTimeMillis() - sttime < TimeLimit4D)) {
-				if (serial.isAvailable()) {
-					data[readc++] = serial.read();
-				} else {
-					Thread.sleep(4);
-				}
-			}
-		} catch (InterruptedException ex) {
+		while ((readc != size) && (System.currentTimeMillis() - sttime < TimeLimit4D)) {
+			data[readc++] = serial.read();
 		}
 		if ((readc != size)) {
 			throw new IOException("Not enough data read");

@@ -104,7 +104,8 @@ public class Intrinsic4dRoutines {
 	public int GetWord() throws IOException {
 		byte readx[] = new byte[2];
 		getbytes(readx, 2);
-		return readx[0] << 8 | readx[1];
+		int result = (readx[0] & 0xff) << 8 | (readx[1] & 0xff);
+		return result;
 	}
 
 	public String getString(int strLen) {
